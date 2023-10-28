@@ -1,0 +1,6 @@
+fastapi
+python-dotenv
+mindsdb_sdk
+cohere
+uvicorn
+cachetools
