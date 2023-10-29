@@ -148,7 +148,7 @@ async def chat_completion(prompt: str):
     current_date = datetime.today().strftime("%Y-%m-%d")
 
     response = co.generate(
-        "Your job is to convert a user input into data that can be used by a code. The user can either request data for a single crypto ('show') or can choose to make a prediction ('predict') with a max date. Your job is to return a string separated by || AND NOTHING ELSE, with first being 'show' or 'predict', second being the cryptocurrency name (Bitcoin, Monero, Litecoin, Dogecoin, XRP, Stellar, Ethereum) and the third being a date. If the date overflows in months/days, you must overflow the years/months too. for show, just give any date. else, give a future date depending on user's input. If the user puts an amount invested, include it next, otherwise, write 0 - DO NOT USE $ SIGN. In the end, give a human like output that makes the investor make a good decision - You are an investment helper. Your statement should be natural and direct, don't advertise anything and don't be overly enthusiastic. DO NOT USE the | character. Keep it very short, about 20-30 words in length. Don't say something like 'this is an amazing opportunity'. the current date is "
+        "Your job is to convert a user input into data that can be used by a code. The user can either request data for a single crypto ('show') or can choose to make a prediction ('predict') with a max date. Your job is to return a string separated by FOUR || AND NOTHING ELSE - to store five values - the type_of_query, coin_name, date, amount without $, summary, with first being 'show' or 'predict', second being the cryptocurrency name (Bitcoin, Monero, Litecoin, Dogecoin, XRP, Stellar, Ethereum) and the third being a date. If the date overflows in months/days, you must overflow the years/months too. for show, just give any date. else, give a future date depending on user's input. If the user puts an amount invested, include it next, otherwise, write 0 - DO NOT USE $ SIGN. In the end, give a human like output that makes the investor make a good decision - You are an investment helper. Your statement should be natural and direct, don't advertise anything and don't be overly enthusiastic. DO NOT USE the | character. Keep it very short, about 20-30 words in length. Don't say something like 'this is an amazing opportunity'. the current date is "
         + current_date
         + ". Eg output is given in \" quotes. Do not use these quotes in response - \"predict||Bitcoin||2024-05-05||200||Investing in Bitcoin today ... etc etc.\" OR \"show||Bitcoin||2021-05-05||0||Summary of the graph\". Note that there should be exactly four || operators and exactly five data points returned, in the same order every time. The user's input is: "
         + prompt
@@ -177,7 +177,7 @@ async def chat_completion(prompt: str):
 
         code = get_crypto_code(coin_name)
         url = f'https://github.com/Pymmdrza/Cryptocurrency_Logos/blob/mainx/PNG/{code.lower()}.png?raw=true'
-        
+
         return {
             "prompt": prompt,
             "response": final_response,
