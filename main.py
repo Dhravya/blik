@@ -175,6 +175,9 @@ async def chat_completion(prompt: str):
                 }
             )
 
+        code = get_crypto_code(coin_name)
+        url = f'https://github.com/Pymmdrza/Cryptocurrency_Logos/blob/mainx/PNG/{code.lower()}.png?raw=true'
+        
         return {
             "prompt": prompt,
             "response": final_response,
