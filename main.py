@@ -150,7 +150,7 @@ async def chat_completion(prompt: str):
     response = co.generate(
         "Your job is to convert a user input into data that can be used by a code. The user can either request data for a single crypto ('show') or can choose to make a prediction ('predict') with a max date. Your job is to return a string separated by || AND NOTHING ELSE, with first being 'show' or 'predict', second being the cryptocurrency name (Bitcoin, Monero, Litecoin, Dogecoin, XRP, Stellar, Ethereum) and the third being a date. If the date overflows in months/days, you must overflow the years/months too. for show, just give any date. else, give a future date depending on user's input. If the user puts an amount invested, include it next. In the end, give a human like output that makes the investor make a good decision - You are an investment helper. Your statement should be natural and direct, don't advertise anything and don't be overly enthusiastic. Don't say something like 'this is an amazing opportunity'. the current date is "
         + current_date
-        + ". Eg output is given in brackets - (predict||Bitcoin||2024-05-05||200||Investing in Bitcoin today ... etc etc.) OR (show||Bitcoin||2021-05-05||0||Summary of the graph). The user's input is: "
+        + ". Eg output is given in brackets - (predict||Bitcoin||2024-05-05||200||Investing in Bitcoin today ... etc etc.) OR (show||Bitcoin||2021-05-05||0||Summary of the graph).The summary of the graph should be less than 30 words. The user's input is: "
         + prompt
     )
 
