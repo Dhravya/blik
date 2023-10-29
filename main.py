@@ -121,8 +121,8 @@ async def get_top():
         final_response = []
 
         for crypto in fastest_growing:
-            code = get_crypto_code(get_crypto_code(crypto[0]))
-            url = f"https://github.com/Pymmdrza/Cryptocurrency_Logos/blob/mainx/PNG/{code.lower()}.png?raw=true"
+            code = get_crypto_code(crypto[0])
+            url = f"https://raw.githubusercontent.com/Pymmdrza/Cryptocurrency_Logos/mainx/PNG/{code.lower() if code else 'btc'}.png"
             final_response.append(
                 {
                     "crypto_name": crypto[0],
@@ -139,7 +139,7 @@ async def get_top():
                     ],
                 }
             )
-        cache["cached_response"] = {"top_5": final_response}
+        cache["cached_response"] = final_response
     return cache["cached_response"]
 
 
@@ -148,14 +148,16 @@ async def chat_completion(prompt: str):
     current_date = datetime.today().strftime("%Y-%m-%d")
 
     response = co.generate(
-        "Your job is to convert a user input into data that can be used by a code. The user can either request data for a single crypto ('show') or can choose to make a prediction ('predict') with a max date. Your job is to return a string separated by || AND NOTHING ELSE, with first being 'show' or 'predict', second being the cryptocurrency name (Bitcoin, Monero, Litecoin, Dogecoin, XRP, Stellar, Ethereum) and the third being a date. If the date overflows in months/days, you must overflow the years/months too. for show, just give any date. else, give a future date depending on user's input. the current date is "
+        "Your job is to convert a user input into data that can be used by a code. The user can either request data for a single crypto ('show') or can choose to make a prediction ('predict') with a max date. Your job is to return a string separated by || AND NOTHING ELSE, with first being 'show' or 'predict', second being the cryptocurrency name (Bitcoin, Monero, Litecoin, Dogecoin, XRP, Stellar, Ethereum) and the third being a date. If the date overflows in months/days, you must overflow the years/months too. for show, just give any date. else, give a future date depending on user's input. If the user puts an amount invested, include it next. In the end, give a human like output that makes the investor make a good decision - You are an investment helper. Your statement should be natural and direct, don't advertise anything and don't be overly enthusiastic. Don't say something like 'this is an amazing opportunity'. the current date is "
         + current_date
-        + ". Eg:predict||Bitcoin||2024-05-05 OR show||Bitcoin||2021-05-05. The user's input is: "
+        + ". Eg output is given in brackets - (predict||Bitcoin||2024-05-05||200||Investing in Bitcoin today ... etc etc.) OR (show||Bitcoin||2021-05-05||0||Summary of the graph). The user's input is: "
         + prompt
     )
 
-    type_of_query, coin_name, date = response.generations[0].strip(" ").split("||")
-    print(type_of_query, coin_name, date)
+    type_of_query, coin_name, date, amount, summary = (
+        response.generations[0].strip(" ").split("||")
+    )
+    print(type_of_query, coin_name, date, amount, summary)
 
     if type_of_query == "show":
         # Make a normal SQL query to get the data from last three months to the current date
@@ -173,7 +175,17 @@ async def chat_completion(prompt: str):
                 }
             )
 
-        return {"prompt": prompt, "response": final_response}
+        return {
+            "prompt": prompt,
+            "response": final_response,
+            "response_type": type_of_query,
+            "crypto_name": coin_name,
+            "crypto_code": code,
+            "date": date,
+            "img_url": url,
+            "amount": amount,
+            "summary": summary,
+        }
     else:
         response = server.query(
             f"SELECT Pred.close, Pred.date, Pred.crypto_name FROM mindsdb.crypto_predictor_new as Pred JOIN files.crypto_prices as Train WHERE Train.date > LATEST AND Train.crypto_name='{coin_name}';"
@@ -181,7 +193,6 @@ async def chat_completion(prompt: str):
         final_response = []
 
         for row, column in response.iterrows():
-            print(column)
             final_response.append(
                 {
                     "date": column["date"],
@@ -190,16 +201,18 @@ async def chat_completion(prompt: str):
             )
 
         code = get_crypto_code(coin_name)
-        url = f"https://github.com/Pymmdrza/Cryptocurrency_Logos/blob/mainx/PNG/{code.lower()}.png?raw=true"
+        url = f"https://github.com/Pymmdrza/Cryptocurrency_Logos/blob/mainx/PNG/{code.lower() if code else 'BTC'}.png?raw=true"
 
         return {
             "prompt": prompt,
             "response": final_response,
             "response_type": type_of_query,
-            "crypto": coin_name,
+            "crypto_name": coin_name,
             "crypto_code": code,
             "date": date,
             "img_url": url,
+            "amount": amount,
+            "summary": summary,
         }
 
 
