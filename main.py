@@ -148,14 +148,23 @@ async def chat_completion(prompt: str):
     current_date = datetime.today().strftime("%Y-%m-%d")
 
     response = co.generate(
-        "Your job is to convert a user input into data that can be used by a code. The user can either request data for a single crypto ('show') or can choose to make a prediction ('predict') with a max date. Your job is to return a string separated by FOUR || AND NOTHING ELSE - to store five values - the type_of_query, coin_name, date, amount without $, summary, with first being 'show' or 'predict', second being the cryptocurrency name (Bitcoin, Monero, Litecoin, Dogecoin, XRP, Stellar, Ethereum) and the third being a date. If the date overflows in months/days, you must overflow the years/months too. for show, just give any date. else, give a future date depending on user's input. If the user puts an amount invested, include it next, otherwise, write 0 - DO NOT USE $ SIGN. In the end, give a human like output that makes the investor make a good decision - You are an investment helper. Your statement should be natural and direct, don't advertise anything and don't be overly enthusiastic. DO NOT USE the || character in the summary. Keep the summary very short and concise, max of 20-30 words. the current date is "
+        "Your job is to convert a user input into data that can be used by a code. The user can either request data for a single crypto ('show') or can choose to make a prediction ('predict') with a max date. Your job is to return a string separated by FOUR || AND NOTHING ELSE - to store five values - the type_of_query, coin_name, date, amount without $, summary, with first being 'show' or 'predict', second being the cryptocurrency name (Bitcoin, Monero, Litecoin, Dogecoin, XRP, Stellar, Ethereum) and the third being a date. If the date overflows in months/days, you must overflow the years/months too. for show, just give any date. else, give a future date depending on user's input. If the user puts an amount invested, include it next, otherwise, write 0 - DO NOT USE $ SIGN. In the end, give a human like output that makes the investor make a good decision - You are an investment helper. Your statement should be natural and direct, don't advertise anything and don't be overly enthusiastic. Keep the summary very short and concise, max of 20-30 words. the current date is "
         + current_date
         + ". Eg output:  predict||Bitcoin||2024-05-05||200||Investing in Bitcoin today. The user's input is: "
         + prompt
     )
-    print(response.generations[0])
+    generation = response.generations[0]
+    # if there are more than 4 '||' operators, remove all extra ones nad the text
+
+    if generation.count("||") > 4:
+        generation = "||".join(generation.split("||")[0:4])
+    print(generation)
+
+    if not generation.count("||") == 4:
+        return {"error": "Something went wrong. Try giving a better query."}
+
     type_of_query, coin_name, date, amount, summary = (
-        (response.generations[0].strip(" ").split("||"))
+        (generation.strip(" ").split("||"))
     )
     print(type_of_query, coin_name, date, amount, summary)
 
