@@ -185,7 +185,7 @@ async def chat_completion(prompt: str):
             )
 
         code = get_crypto_code(coin_name)
-        url = f'https://github.com/Pymmdrza/Cryptocurrency_Logos/blob/mainx/PNG/{code.lower()}.png?raw=true'
+        url = f"https://raw.githubusercontent.com/Pymmdrza/Cryptocurrency_Logos/mainx/PNG/{code.lower() if code else 'btc'}.png"
 
         return {
             "prompt": prompt,
@@ -213,7 +213,7 @@ async def chat_completion(prompt: str):
             )
 
         code = get_crypto_code(coin_name)
-        url = f"https://github.com/Pymmdrza/Cryptocurrency_Logos/blob/mainx/PNG/{code.lower() if code else 'BTC'}.png?raw=true"
+        url = f"https://raw.githubusercontent.com/Pymmdrza/Cryptocurrency_Logos/mainx/PNG/{code.lower() if code else 'btc'}.png"
 
         return {
             "prompt": prompt,
